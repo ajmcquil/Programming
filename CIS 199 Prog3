@@ -1,0 +1,109 @@
+// Program 3
+// CIS 199-01/-75
+// Due: 4/7/2015
+// By: Andrew McQuillen
+// this program is a spin off program 2. in this program we will take the registration times and use range matching 
+// and parallel arrays to match the input last name and grade with the corresponding time and date for class registration
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+namespace Prog2
+{
+    public partial class RegForm : Form
+    {
+        public RegForm()
+        {
+            InitializeComponent();
+        }
+
+        private void findRegTimeBtn_Click(object sender, EventArgs e)
+        {
+            const string DAY1 = "April 1";  // 1st day of registration
+            const string DAY2 = "April 2"; // 2nd day of registration
+            const string DAY3 = "April 3"; // 3rd day of registration
+            const string DAY4 = "April 6"; // 4th day of registration
+            const string DAY5 = "April 7"; // 5th day of registration
+            const string DAY6 = "April 8"; // 6th day of registration
+
+            const string TIME1 = "8:30 AM";  // 1st time block
+            const string TIME2 = "10:00 AM"; // 2nd time block
+            const string TIME3 = "11:30 AM"; // 3rd time block
+            const string TIME4 = "2:00 PM";  // 4th time block
+            const string TIME5 = "4:00 PM";  // 5th time block
+
+            string lastNameStr;       // Entered last name
+            char lastNameLetterCh;    // First letter of last name, as char
+            string dateStr = "Error"; // Holds date of registration
+            string timeStr = "Error"; // Holds time of registration
+
+            lastNameStr = lastNameTxt.Text;
+
+            if (lastNameStr == "") // Empty text box
+                MessageBox.Show("Please enter last name!");
+            else
+            {
+                lastNameLetterCh = lastNameStr[0]; // As in text, p. 466-467
+
+                if (!char.IsLetter(lastNameLetterCh)) // Is it a letter or not?
+                    MessageBox.Show("Please ensure a letter is in first position of last name!");
+                else
+                {
+                    lastNameLetterCh = char.ToUpper(lastNameLetterCh); // Ensure upper case
+
+                    // Juniors and Seniors share same schedule but different days
+                    if (juniorBtn.Checked || seniorBtn.Checked)
+                    {
+                        if (seniorBtn.Checked)
+                            dateStr = DAY1;
+                        else // Must be juniors
+                            dateStr = DAY2;
+                        //sets lower limits of time and last name letter
+                        char[] juniorSeniorLowerLimit = { 'A', 'E', 'J', 'P', 'T' };
+                        string[] juniorSeniorTime = { TIME2, TIME3, TIME4, TIME5, TIME1 };
+                        int k = juniorSeniorLowerLimit.Length - 1;//initializes array start point
+                        while (k >= 0 && lastNameLetterCh < juniorSeniorLowerLimit[k]) k--;//runs through the array matching input to values
+                        timeStr = juniorSeniorTime[k];//matches time and assigns time to timestr
+                    }
+                    // Sophomores and Freshmen
+                    else // Must be soph/fresh
+                    {
+                        if (sophBtn.Checked)
+                        {
+                            // G-S on one day
+                            if ((lastNameLetterCh >= 'G') && // >= G and
+                                (lastNameLetterCh <= 'S'))   // <= S
+                                dateStr = DAY4;
+                            else // All other letters on previous day
+                                dateStr = DAY3;
+                        }
+                        else // must be freshman
+                        {
+                            // G-S on one day
+                            if ((lastNameLetterCh >= 'G') && // >= G and
+                                (lastNameLetterCh <= 'S'))   // <= S
+                                dateStr = DAY6;
+                            else // All other letters on previous day
+                                dateStr = DAY5;
+                        }
+                        //sets lower limits of time and last name letter
+                        char[] freshmanSophomoreLowerLimit = { 'W', 'A', 'C', 'E', 'T', 'J', 'M', 'P', 'R', 'G' };
+                        string[] freshmanSophomoreTime = { TIME2, TIME3, TIME4, TIME5, TIME1, TIME2, TIME3, TIME4,TIME5, TIME1 };
+
+                        int i = freshmanSophomoreLowerLimit.Length - 1;//initializes array start point
+                        while (i >= 0 && lastNameLetterCh < freshmanSophomoreLowerLimit[i]) --i;//runs through the array matching input to values
+                        timeStr = freshmanSophomoreTime[i];//matches time and assigns time to timestr
+
+                    }
+
+                    dateTimeLbl.Text = dateStr + " at " + timeStr; //prints label with time and date
+                }
+            }
+        }
+    }
+}
