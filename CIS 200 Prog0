@@ -1,0 +1,168 @@
+//AJ McQuillen
+//CIS 200-01
+//May 21, 2015
+//Program 0- the purpose of this program is to use composition and inheritance (HAS-A, IS-A) relationships to 
+//lay the groundwork for future programs. 
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Program_0
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //Lists 4 addresses and assigns them as properties for 3 letters
+            Address address1 = new Address("Broadway Joe","100 East Broadway","","New York","NY",10010);
+            Address address2 = new Address("Adam West","200 West Liberty","","Seattle","WA",98101);
+            Address address3 = new Address("Kobe Bryant", "300 West Main","","Los Angeles","CA",90001);
+            Address address4 = new Address("Dick Butkus","400 East Jefferson","","Chicago","IL",60290);
+            Letter firstLetter = new Letter(address1, address2, 100);
+            Letter secondLetter = new Letter( address2, address3,150);
+            Letter thirdLetter = new Letter(address3, address4, 200);
+            
+            //Create Parcel List and Add letters to Parcel List
+            List<Parcel> items = new List<Parcel>();
+            items.Add(firstLetter);
+            items.Add(secondLetter);
+            items.Add(thirdLetter);
+            
+            //Print the letter information with formatted headers
+            Console.WriteLine("\n**Letter 1**\n{0}", firstLetter);
+            Console.WriteLine("\n**Letter 2**\n{0}", secondLetter);
+            Console.WriteLine("\n**Letter 3**\n{0}", thirdLetter);
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Program_0
+{
+    class Letter : Parcel//derived class letter from parcel
+    {
+        private decimal fixedCost;//fixed cost
+        private const int MIN_VALUE = 0;//constant to eliminate magic numbers
+        //Letter constructor utilizing base class properties and setting constructor for fixed cost
+        public Letter(Address origin, Address destination, decimal cost) :base(origin, destination)
+        {
+            fixedCost = cost;
+        }
+        private decimal FixedCost//constructor definition so fixed cost returns input value, but validates to be greater than 0
+        {
+            get
+            {
+                return fixedCost;
+            }
+            set
+            {
+                if (value > MIN_VALUE)
+                    fixedCost = value;
+                else
+                    throw new ArgumentOutOfRangeException(
+                        "FixedCost", value, "Fixed Cost must be greater than 0");//same exception argument from address
+            }
+        }
+        //Preconditions: None
+        //Postconditions: returns the cost of the parcel
+        public override decimal CalcCost()//overrides calcost to just display fixed cost 
+        {
+            return fixedCost;
+        }
+        public override string ToString()//string format for calc cost. base.ToString calls inherited formatting from parcel
+        {
+            return string.Format("\n{0}\nCost= {1:C}", base.ToString(), FixedCost);
+        }
+        }
+    }
+
+------------------------------------------------------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Program_0
+{
+    public abstract class Parcel//abstract public class Parcel, the parent class to Letter
+    {
+        public Address OriginAddress { get; set; }//uses the Address class to build new constructor in Parcel
+        public Address DestinationAddress { get; set; }
+
+        public Parcel(Address origin, Address destination)//constructor in Parcel that will define originAddress and destiantionAddress
+        {
+            OriginAddress = origin;
+            DestinationAddress = destination;
+        }
+        //Precondition: No
+        //PostCondition: returns the cost of the parcel
+        public abstract decimal  CalcCost();//abstract calc cost method
+        //Preccondition:
+        public override string ToString()//string format for how origin address and destination address will be displayed
+        {
+            return string.Format("Origin Address\n---------------{0}\nDestination Address\n--------------------{1}", 
+                OriginAddress,DestinationAddress);
+        }
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Program_0
+{
+    public class Address//Address class
+    {
+        public string Name { get; private set; }//get and set properties default for Name
+        public string Address1 { get; private set; }//get and set properties default for Address1
+        public string Address2 { get; private set; }//get and set properties default for Address2
+        public string City { get; private set; }//get and set properties default for city
+        public string State { get; private set; }//get and set properties default for state
+        public int zip;//no deafault for zip since it will have conditions
+        public const int MIN_ZIP = 0;//constants to eliminate the need for magic numbers
+        public const int MAX_ZIP = 99999;//constant to eliminate the need for magic numbers
+
+        public Address( string theName, string theAddress1, string theAddress2,string theCity,
+            string theState, int theZip)//constructor to initialize name, addresses, city, state, and zip
+        {
+            Name = theName;
+            Address1 = theAddress1;
+            Address2 = theAddress2;
+            City = theCity;
+            State = theState;
+            zip = theZip;
+        }
+        public int Zip//sets conditions for Zip, less than 99999 but greater than 0
+        {
+            get
+            {
+                return zip;
+            }
+            private set
+            {
+                if (value > MIN_ZIP && value <= MAX_ZIP)
+                    zip = value;
+                else
+                    throw new ArgumentOutOfRangeException(
+                        "Zip", value, "Zip must be between 0 and 99999");//exception argument if the number does not meet this criteria
+            }
+        }
+            public override string ToString()//formatted string to structure name, address, city, state, zip output
+            {
+                return string.Format( "\n{0}\n{1}\n{2}{3},{4} {5:D5}\n",Name, Address1, Address2, 
+                    City, State, Zip);
+            }
+        }
+    }
